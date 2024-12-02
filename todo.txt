@@ -1,0 +1,124 @@
+managers
+    name: String
+    cellNumber: string
+    address[
+        {
+            address: string ,
+            city: string 
+            state: string
+            zipCode: string|numbers
+        }
+    ] ,
+
+    keys
+        [
+            {
+                keyWay:string|Number
+                keyCode: string|Number
+            }
+        ]
+
+
+
+
+
+
+
+you need a table (management) that holds the
+1 name of the manager 
+2 itemsManage  (this is the relation on to many )
+
+3 name is a string that can change 
+4 itemsManage is a array of objects that contains multiple files address, keyWay , KeyCode
+
+
+
+You need a table (address) that holds the 
+address:string
+
+
+
+
+you need a table (key) that holds 
+
+keyWay: string
+keyCode: string (on letter one word  with a space in the middle that is the  example : Q4 B3 B2 Q4 K3 (unique))
+
+
+
+
+
+
+
+!!!!!!!!!
+
+
+so you need to make a overview 
+
+the manager will have a 
+addresses array
+and a keys array 
+
+
+
+they will all be connected to   
+
+so      this address belong this managers and that address can have multiple key
+
+
+
+!!!!!
+
+
+
+
+
+
+
+in other word 
+
+
+managers
+    address[
+        {
+            address: string ,
+            city: string 
+            state: string
+            zipCode: string|numbers
+        }
+    ] ,
+
+    keys
+        [
+            {
+                keyWay:string|Number
+                keyCode: string|Number
+            }
+        ]
+
+
+
+
+
+to add 
+
+make the table 
+
+it will be a one to many table 
+
+there will be a management
+
+management :
+
+name : string
+itemsManage : [string]  
+
+
+
+
+key codes
+    address
+    key way 
+    key codes :[string] 
+    
+
