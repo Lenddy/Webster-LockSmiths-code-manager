@@ -10,16 +10,16 @@ const { makeExecutableSchema } = require("@graphql-tools/schema"); // Import sch
 require("dotenv").config(); // Load environment variables from the .env file
 
 // Import type definitions and resolvers for different entities
-const { clientTypeDef } = require("./server/graphql/types/client.typeDef");
-const { clientResolvers } = require("./server/graphql/resolvers/client.resolver");
+const { supervisorTypeDef } = require("./server/graphql/types/supervisor.typeDef");
+const { supervisorResolvers } = require("./server/graphql/resolvers/supervisor.resolver");
 /*const { vehicleTypeDef } = require("./server/graphql/types/vehicle.typeDef");
   const { vehicleResolvers } = require("./server/graphql/resolvers/vehicle.resolver");
   const { dealTypeDef } = require("./server/graphql/types/deal.typeDef");
   const { dealResolvers } = require("./server/graphql/resolvers/deal.resolver");
   */
 // Merge all type definitions and resolvers into single objects
-const mergedTypeDefs = mergeTypeDefs([clientTypeDef]); // Combine type definitions
-const mergedResolvers = mergeResolvers([clientResolvers]); // Combine resolvers
+const mergedTypeDefs = mergeTypeDefs([supervisorTypeDef]); // Combine type definitions
+const mergedResolvers = mergeResolvers([supervisorResolvers]); // Combine resolvers
 
 // Create a GraphQL schema using the merged type definitions and resolvers
 const schema = makeExecutableSchema({
