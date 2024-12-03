@@ -81,486 +81,6 @@ const managerResolvers = {
 			}
 		},
 
-		// ! later on change the ids to be a le to take arrays  of ids to update multiple  also do the same for the other info
-		// updateOneManager: async (parent, args, context, info) => {
-		// 	const { id, addressID, keyId, name, addressInfo, keyInfo } = args;
-		// 	const update = { updatedAt: new Date().toISOString() };
-
-		// 	if (name !== undefined) {
-		// 		update.name = name;
-		// 	}
-		// 	if (addressID !== undefined || keyId !== undefined) {
-		// 		const bulkOps = [];
-
-		// 		if (addressInfo.address !== undefined || addressInfo.city !== undefined || addressInfo.state !== undefined || addressInfo.zipCode !== undefined) {
-		// 			bulkOps.push({
-		// 				updateOne: {
-		// 					// * try changing the id to _id if there is an error not finding the id
-		// 					filter: {
-		// 						_id: id,
-		// 						"addresses._id": addressID,
-		// 					},
-		// 					update: {
-		// 						$set: {
-		// 							address: addressInfo.address,
-		// 							city: addressInfo.city,
-		// 							state: addressInfo.state,
-		// 							zipCode: addressInfo.zipCode,
-		// 						},
-		// 					},
-		// 				},
-		// 			});
-		// 		}
-
-		// 		// if (keyInfo.keyWay !== undefined || keyInfo.keyCode !== undefined || keyInfo.doorLocation !== undefined) {
-		// 		// 	bulkOps.push({
-		// 		// 		updateOne: {
-		// 		// 			// * try changing the id to _id if there is an error not finding the id
-		// 		// 			filter: {
-		// 		// 				_id: id,
-		// 		// 				"keys.id": keyInfo.id,
-		// 		// 			},
-		// 		// 			update: {
-		// 		// 				$set: {
-		// 		// 					keyWay: keyInfo.keyWay,
-		// 		// 					keyCode: keyInfo.keyCode,
-		// 		// 					doorLocation: keyInfo.doorLocation,
-		// 		// 				},
-		// 		// 			},
-		// 		// 		},
-		// 		// 	});
-		// 		// }
-
-		// 		// for (const phone of cellPhones) {
-		// 		// 	if (phone.status === "add") {
-		// 		// 		const newPhone = {
-		// 		// 			numberId: uuidv4(),
-		// 		// 			number: phone.number,
-		// 		// 		};
-
-		// 		// 		bulkOps.push({
-		// 		// 			updateOne: {
-		// 		// 				filter: { _id: id },
-		// 		// 				update: {
-		// 		// 					$push: { cellPhones: newPhone },
-		// 		// 				},
-		// 		// 			},
-		// 		// 		});
-		// 		// 	} else if (phone.status === "update") {
-		// 		// 		bulkOps.push({
-		// 		// 			updateOne: {
-		// 		// 				filter: {
-		// 		// 					_id: id,
-		// 		// 					"cellPhones.numberId": phone.numberId,
-		// 		// 				},
-		// 		// 				update: {
-		// 		// 					$set: {
-		// 		// 						"cellPhones.$.number": phone.number,
-		// 		// 					},
-		// 		// 				},
-		// 		// 			},
-		// 		// 		});
-		// 		// 	} else if (phone.status === "delete") {
-		// 		// 		bulkOps.push({
-		// 		// 			updateOne: {
-		// 		// 				filter: {
-		// 		// 					_id: id,
-		// 		// 					"cellPhones.numberId": phone.numberId,
-		// 		// 				},
-		// 		// 				update: {
-		// 		// 					$pull: {
-		// 		// 						cellPhones: {
-		// 		// 							numberId: phone.numberId,
-		// 		// 						},
-		// 		// 					},
-		// 		// 				},
-		// 		// 			},
-		// 		// 		});
-		// 		// 	}
-		// 		// }
-
-		// 		if (bulkOps.length > 0) {
-		// 			await Manager.bulkWrite(bulkOps);
-		// 		}
-		// 	}
-
-		// 	return await Manager.findByIdAndUpdate(id, update, { new: true })
-		// 		.then((updatedManager) => {
-		// 			pubsub.publish("MANAGER_UPDATED", {
-		// 				onManagerChange: {
-		// 					eventType: "MANAGER_UPDATED",
-		// 					managerChanges: updatedManager,
-		// 				},
-		// 			});
-		// 			console.log("Manager update");
-		// 			return updatedManager;
-		// 		})
-		// 		.catch((err) => {
-		// 			console.log("error", err);
-		// 		});
-		// },
-
-		// updateOneManager: async (parent, args, context, info) => {
-		// 	const { id, name, addresses = [], keys = [] } = args;
-
-		// 	const update = { updatedAt: new Date().toISOString() };
-		// 	if (name !== undefined) {
-		// 		update.name = name;
-		// 	}
-
-		// 	try {
-		// 		const bulkOps = [];
-
-		// 		// Process addresses
-		// 		addresses.forEach((address) => {
-		// 			if (address.status === "add") {
-		// 				bulkOps.push({
-		// 					updateOne: {
-		// 						filter: { _id: id },
-		// 						update: { $push: { addresses: { ...address, _id: new mongoose.Types.ObjectId() } } },
-		// 					},
-		// 				});
-		// 			} else if (address.status === "update") {
-		// 				bulkOps.push({
-		// 					updateOne: {
-		// 						filter: { _id: id, "addresses._id": address._id },
-		// 						update: {
-		// 							$set: {
-		// 								"addresses.$.address": address.address,
-		// 								"addresses.$.city": address.city,
-		// 								"addresses.$.state": address.state,
-		// 								"addresses.$.zipCode": address.zipCode,
-		// 							},
-		// 						},
-		// 					},
-		// 				});
-		// 			} else if (address.status === "delete") {
-		// 				bulkOps.push({
-		// 					updateOne: {
-		// 						filter: { _id: id },
-		// 						update: { $pull: { addresses: { _id: address._id } } },
-		// 					},
-		// 				});
-		// 			}
-		// 		});
-
-		// 		// Process keys
-		// 		keys.forEach((key) => {
-		// 			if (key.status === "add") {
-		// 				bulkOps.push({
-		// 					updateOne: {
-		// 						filter: { _id: id },
-		// 						update: { $push: { keys: { ...key, _id: new mongoose.Types.ObjectId() } } },
-		// 					},
-		// 				});
-		// 			} else if (key.status === "update") {
-		// 				bulkOps.push({
-		// 					updateOne: {
-		// 						filter: { _id: id, "keys._id": key._id },
-		// 						update: {
-		// 							$set: {
-		// 								"keys.$.keyWay": key.keyWay,
-		// 								"keys.$.keyCode": key.keyCode,
-		// 								"keys.$.doorLocation": key.doorLocation,
-		// 							},
-		// 						},
-		// 					},
-		// 				});
-		// 			} else if (key.status === "delete") {
-		// 				bulkOps.push({
-		// 					updateOne: {
-		// 						filter: { _id: id },
-		// 						update: { $pull: { keys: { _id: key._id } } },
-		// 					},
-		// 				});
-		// 			}
-		// 		});
-
-		// 		// Execute bulk operations if any
-		// 		if (bulkOps.length > 0) {
-		// 			await Manager.bulkWrite(bulkOps);
-		// 		}
-
-		// 		// Update other fields
-		// 		const updatedManager = await Manager.findByIdAndUpdate(id, update, { new: true });
-
-		// 		if (!updatedManager) {
-		// 			throw new Error("Manager not found");
-		// 		}
-
-		// 		// Publish updates
-		// 		pubsub.publish("MANAGER_UPDATED", {
-		// 			onManagerChange: {
-		// 				eventType: "MANAGER_UPDATED",
-		// 				managerChanges: updatedManager,
-		// 			},
-		// 		});
-
-		// 		console.log("Manager updated", updatedManager);
-		// 		return updatedManager;
-		// 	} catch (err) {
-		// 		console.error("Error updating manager", err);
-		// 		throw err;
-		// 	}
-		// },
-
-		// updateOneManager: async (parent, args, context, info) => {
-		// 	const { id, name, addresses = [], keys = [] } = args;
-
-		// 	const update = {};
-		// 	let hasUpdates = false; // Flag to track if there's valid data to update
-
-		// 	if (name !== null && name !== undefined) {
-		// 		update.name = name;
-		// 		hasUpdates = true;
-		// 	}
-
-		// 	try {
-		// 		const bulkOps = [];
-
-		// 		// Process addresses
-		// 		if (Array.isArray(addresses)) {
-		// 			addresses.forEach((address) => {
-		// 				if (!address || !address.status) return; // Skip if no valid address or status
-
-		// 				if (address.status === "add" && address.address && address.city) {
-		// 					bulkOps.push({
-		// 						updateOne: {
-		// 							filter: { _id: id },
-		// 							update: { $push: { addresses: { ...address, _id: new mongoose.Types.ObjectId() } } },
-		// 						},
-		// 					});
-		// 				} else if (address.status === "update" && address._id) {
-		// 					bulkOps.push({
-		// 						updateOne: {
-		// 							filter: { _id: id, "addresses._id": address._id },
-		// 							update: {
-		// 								$set: {
-		// 									"addresses.$.address": address.address,
-		// 									"addresses.$.city": address.city,
-		// 									"addresses.$.state": address.state,
-		// 									"addresses.$.zipCode": address.zipCode,
-		// 								},
-		// 							},
-		// 						},
-		// 					});
-		// 				} else if (address.status === "delete" && address._id) {
-		// 					bulkOps.push({
-		// 						updateOne: {
-		// 							filter: { _id: id },
-		// 							update: { $pull: { addresses: { _id: address._id } } },
-		// 						},
-		// 					});
-		// 				}
-		// 			});
-		// 		}
-
-		// 		// Process keys
-		// 		if (Array.isArray(keys)) {
-		// 			keys.forEach((key) => {
-		// 				if (!key || !key.status) return; // Skip if no valid key or status
-
-		// 				if (key.status === "add" && key.keyWay && key.keyCode) {
-		// 					bulkOps.push({
-		// 						updateOne: {
-		// 							filter: { _id: id },
-		// 							update: { $push: { keys: { ...key, _id: new mongoose.Types.ObjectId() } } },
-		// 						},
-		// 					});
-		// 				} else if (key.status === "update" && key._id) {
-		// 					bulkOps.push({
-		// 						updateOne: {
-		// 							filter: { _id: id, "keys._id": key._id },
-		// 							update: {
-		// 								$set: {
-		// 									"keys.$.keyWay": key.keyWay,
-		// 									"keys.$.keyCode": key.keyCode,
-		// 									"keys.$.doorLocation": key.doorLocation,
-		// 								},
-		// 							},
-		// 						},
-		// 					});
-		// 				} else if (key.status === "delete" && key._id) {
-		// 					bulkOps.push({
-		// 						updateOne: {
-		// 							filter: { _id: id },
-		// 							update: { $pull: { keys: { _id: key._id } } },
-		// 						},
-		// 					});
-		// 				}
-		// 			});
-		// 		}
-
-		// 		// Execute bulk operations if any valid operations exist
-		// 		if (bulkOps.length > 0) {
-		// 			await Manager.bulkWrite(bulkOps);
-		// 			hasUpdates = true; // Flag as having performed updates
-		// 		}
-
-		// 		// Perform main update if there are updates
-		// 		if (hasUpdates) {
-		// 			const updatedManager = await Manager.findByIdAndUpdate(id, update, { new: true });
-
-		// 			if (!updatedManager) {
-		// 				throw new Error("Manager not found");
-		// 			}
-
-		// 			// Publish updates
-		// 			pubsub.publish("MANAGER_UPDATED", {
-		// 				onManagerChange: {
-		// 					eventType: "MANAGER_UPDATED",
-		// 					managerChanges: updatedManager,
-		// 				},
-		// 			});
-
-		// 			console.log("Manager updated", updatedManager);
-		// 			return updatedManager;
-		// 		} else {
-		// 			console.log("No valid updates provided");
-		// 			return null; // Return null if nothing to update
-		// 		}
-		// 	} catch (err) {
-		// 		console.error("Error updating manager", err);
-		// 		throw err;
-		// 	}
-		// },
-
-		// updateOneManager: async (parent, args, context, info) => {
-		// 	const { id, name, addresses, keys } = args;
-
-		// 	console.log("this are the given arguments", args);
-
-		// 	const update = {};
-		// 	let hasUpdates = false; // Flag to track if there's valid data to update
-
-		// 	// Update the name field if it's provided
-		// 	if (name !== null && name !== undefined) {
-		// 		update.name = name;
-		// 		hasUpdates = true;
-		// 	}
-
-		// 	try {
-		// 		const bulkOps = []; // Array to hold bulk operations
-
-		// 		// Normalize addresses to an array if it's a single object
-		// 		const normalizedAddresses = Array.isArray(addresses) ? addresses : addresses ? [addresses] : [];
-
-		// 		// Process addresses and prepare bulk operations
-		// 		normalizedAddresses.forEach((address) => {
-		// 			if (!address || !address.status) return; // Skip if no valid address or status
-
-		// 			// Handle adding new addresses
-		// 			if (address.status === "add" && address.address && address.city) {
-		// 				bulkOps.push({
-		// 					updateOne: {
-		// 						filter: { _id: id },
-		// 						update: { $push: { addresses: { ...address, _id: new mongoose.Types.ObjectId() } } },
-		// 					},
-		// 				});
-		// 			}
-		// 			// Handle updating existing addresses
-		// 			else if (address.status === "update" && address._id) {
-		// 				bulkOps.push({
-		// 					updateOne: {
-		// 						filter: { _id: id, "addresses._id": address._id },
-		// 						update: {
-		// 							$set: {
-		// 								"addresses.$.address": address.address,
-		// 								"addresses.$.city": address.city,
-		// 								"addresses.$.state": address.state,
-		// 								"addresses.$.zipCode": address.zipCode,
-		// 							},
-		// 						},
-		// 					},
-		// 				});
-		// 			}
-		// 			// Handle deleting addresses
-		// 			else if (address.status === "delete" && address._id) {
-		// 				bulkOps.push({
-		// 					updateOne: {
-		// 						filter: { _id: id },
-		// 						update: { $pull: { addresses: { _id: address._id } } },
-		// 					},
-		// 				});
-		// 			}
-		// 		});
-
-		// 		// Normalize keys to an array if it's a single object
-		// 		const normalizedKeys = Array.isArray(keys) ? keys : keys ? [keys] : [];
-
-		// 		// Process keys and prepare bulk operations
-		// 		normalizedKeys.forEach((key) => {
-		// 			if (!key || !key.status) return; // Skip if no valid key or status
-
-		// 			// Handle adding new keys
-		// 			if (key.status === "add" && key.keyWay && key.keyCode) {
-		// 				bulkOps.push({
-		// 					updateOne: {
-		// 						filter: { _id: id },
-		// 						update: { $push: { keys: { ...key, _id: new mongoose.Types.ObjectId() } } },
-		// 					},
-		// 				});
-		// 			}
-		// 			// Handle updating existing keys
-		// 			else if (key.status === "update" && key._id) {
-		// 				bulkOps.push({
-		// 					updateOne: {
-		// 						filter: { _id: id, "keys._id": key._id },
-		// 						update: {
-		// 							$set: {
-		// 								"keys.$.keyWay": key.keyWay,
-		// 								"keys.$.keyCode": key.keyCode,
-		// 								"keys.$.doorLocation": key.doorLocation,
-		// 							},
-		// 						},
-		// 					},
-		// 				});
-		// 			}
-		// 			// Handle deleting keys
-		// 			else if (key.status === "delete" && key._id) {
-		// 				bulkOps.push({
-		// 					updateOne: {
-		// 						filter: { _id: id },
-		// 						update: { $pull: { keys: { _id: key._id } } },
-		// 					},
-		// 				});
-		// 			}
-		// 		});
-
-		// 		// Execute bulk operations if any valid operations exist
-		// 		if (bulkOps.length > 0) {
-		// 			await Manager.bulkWrite(bulkOps);
-		// 			hasUpdates = true; // Flag as having performed updates
-		// 		}
-
-		// 		// Perform the main update if there are updates
-		// 		if (hasUpdates) {
-		// 			const updatedManager = await Manager.findByIdAndUpdate(id, update, { new: true });
-
-		// 			if (!updatedManager) {
-		// 				throw new Error("Manager not found");
-		// 			}
-
-		// 			// Publish updates to any subscribers (e.g., for a GraphQL subscription)
-		// 			pubsub.publish("MANAGER_UPDATED", {
-		// 				onManagerChange: {
-		// 					eventType: "MANAGER_UPDATED",
-		// 					managerChanges: updatedManager,
-		// 				},
-		// 			});
-
-		// 			console.log("Manager updated", updatedManager);
-		// 			return updatedManager; // Return the updated manager object
-		// 		} else {
-		// 			console.log("No valid updates provided");
-		// 			return null; // Return null if no updates were made
-		// 		}
-		// 	} catch (err) {
-		// 		console.error("Error updating manager", err); // Log the error for debugging
-		// 		throw err; // Rethrow the error so it can be handled by the calling function
-		// 	}
-		// },
-
 		updateOneManager: async (parent, args, context, info) => {
 			const { id, name, addressesInfo, keysInfo } = args;
 
@@ -601,7 +121,7 @@ const managerResolvers = {
 						bulkOps.push({
 							updateOne: {
 								filter: { _id: id },
-								update: { $push: { addresses: { ...address, _id: new mongoose.Types.ObjectId() } } },
+								update: { $push: { addresses: { ...address } } },
 							},
 						});
 					}
@@ -623,7 +143,7 @@ const managerResolvers = {
 						});
 					}
 					// Handle deleting addresses
-					else if (address.status === "delete" && address._id) {
+					else if (address.status === "delete" && address.addressId) {
 						console.log("Deleting address:", address);
 						bulkOps.push({
 							updateOne: {
@@ -656,16 +176,16 @@ const managerResolvers = {
 						bulkOps.push({
 							updateOne: {
 								filter: { _id: id },
-								update: { $push: { keys: { ...key, _id: new mongoose.Types.ObjectId() } } },
+								update: { $push: { keys: { ...key } } },
 							},
 						});
 					}
 					// Handle updating existing keys
-					else if (key.status === "update" && key._id) {
+					else if (key.status === "update" && key.keyId) {
 						console.log("Updating key:", key);
 						bulkOps.push({
 							updateOne: {
-								filter: { _id: id, "keys._id": key._id },
+								filter: { _id: id, "keys._id": key.keyId },
 								update: {
 									$set: {
 										"keys.$.keyWay": key.keyWay,
@@ -677,12 +197,12 @@ const managerResolvers = {
 						});
 					}
 					// Handle deleting keys
-					else if (key.status === "delete" && key._id) {
+					else if (key.status === "delete" && key.keyId) {
 						console.log("Deleting key:", key);
 						bulkOps.push({
 							updateOne: {
 								filter: { _id: id },
-								update: { $pull: { keys: { _id: key._id } } },
+								update: { $pull: { keys: { _id: key.keyId } } },
 							},
 						});
 					}
@@ -728,23 +248,23 @@ const managerResolvers = {
 			}
 		},
 
-		// deleteOneManager: async (_, { id }) => {
-		// 	return await Client.findByIdAndDelete(id)
-		// 		.then((deletedClient) => {
-		// 			pubsub.publish("CLIENT_DELETED", {
-		// 				onClientChange: {
-		// 					eventType: "CLIENT_DELETED",
-		// 					clientChanges: deletedClient,
-		// 				},
-		// 			});
-		// 			console.log("a client was deleted", deletedClient, "\n____________________");
-		// 			return deletedClient;
-		// 		})
-		// 		.catch((err) => {
-		// 			console.log("there was an error deleting a client", err, "\n____________________");
-		// 			throw err;
-		// 		});
-		// },
+		deleteOneManager: async (_, { id }) => {
+			return await Manager.findByIdAndDelete(id)
+				.then((deletedManager) => {
+					pubsub.publish("MANAGER_DELETED", {
+						onManagerChange: {
+							eventType: "MANAGER_DELETED",
+							managerChanges: deletedManager,
+						},
+					});
+					console.log("a client was deleted", deletedManager, "\n____________________");
+					return deletedManager;
+				})
+				.catch((err) => {
+					console.log("there was an error deleting a client", err, "\n____________________");
+					throw err;
+				});
+		},
 	},
 
 	Subscription: {

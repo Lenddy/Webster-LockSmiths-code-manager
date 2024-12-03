@@ -77,7 +77,7 @@ const managerTypeDef = gql`
 
 		updateOneManager(id: ID!, name: String, addressesInfo: [AddressUpdateInput], keysInfo: [keyUpdateInput]): Manager!
 
-		# deleteOneManager(id: ID!): Client!
+		deleteOneManager(id: ID!): Manager!
 
 		# deleteOneClientItem(id: ID!, cellPhone: [NumberInput]): Boolean
 	}
