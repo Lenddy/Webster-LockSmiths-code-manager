@@ -1,14 +1,14 @@
 const { gql } = require("apollo-server-express");
 require("../scalar/dateTime");
 
-const supervisorTypeDef = gql`
+const managerTypeDef = gql`
 	scalar DateTime
 
 	# Object
-	type Supervisor {
+	type Manager {
 		id: ID!
-		Name: String!
-		Addresses: [Address!]!
+		name: String!
+		addresses: [Address!]!
 		keys: [key!]!
 		createdAt: DateTime!
 		updatedAt: DateTime!
@@ -29,16 +29,16 @@ const supervisorTypeDef = gql`
 		doorLocation: String!
 	}
 
-	type supervisorChange {
+	type managerChange {
 		eventType: String
-		supervisoChange: Supervisor!
+		managerChange: Manager!
 	}
 
 	# Queries
 	type Query {
 		hello: String
-		getAllSupervisors: [Supervisor!]!
-		getOneSupervisor(id: ID!): Supervisor!
+		getAllManagers: [Manager!]!
+		getOneManager(id: ID!): Manager!
 	}
 
 	input AddressInput {
@@ -48,17 +48,34 @@ const supervisorTypeDef = gql`
 		zipCode: String!
 	}
 
+	input AddressUpdateInput {
+		addressId: ID
+		address: String
+		city: String
+		state: String
+		zipCode: String
+		status: String
+	}
+
 	input keyInput {
 		keyWay: String!
 		keyCode: String!
 		doorLocation: String!
 	}
 
+	input keyUpdateInput {
+		keyId: ID
+		keyWay: String
+		keyCode: String
+		doorLocation: String
+		status: String
+	}
+
 	# Mutations
 	type Mutation {
-		createOneSupervisor(Name: String!, Addresses: [AddressInput!]!, keys: [keyInput!]!): Supervisor!
+		createOneManager(name: String!, addresses: [AddressInput!]!, keys: [keyInput!]!): Manager!
 
-		# updateOneManager(id: ID!, clientName: String, clientLastName: String, cellPhones: [NumberInput]): Client!
+		updateOneManager(id: ID!, name: String, addressesInfo: [AddressUpdateInput], keysInfo: [keyUpdateInput]): Manager!
 
 		# deleteOneManager(id: ID!): Client!
 
@@ -67,11 +84,11 @@ const supervisorTypeDef = gql`
 
 	# Re-renders data on data update
 	type Subscription {
-		onSupervisorChange: supervisorChange
+		onManagerChange: managerChange
 	}
 `;
 
-module.exports = { supervisorTypeDef };
+module.exports = { managerTypeDef };
 
 // # skip for now
 // # !!!!!!!!!!

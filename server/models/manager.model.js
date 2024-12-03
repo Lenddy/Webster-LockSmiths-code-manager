@@ -1,16 +1,16 @@
 // Importing Schema and model to create the schema and saving it to the database
 const { Schema, model } = require("mongoose");
 
-const SupervisorSchema = new Schema(
+const ManagerSchema = new Schema(
 	{
 		// Attributes for the database
-		Name: {
+		name: {
 			type: String,
 			required: true,
 			min: [2, "Name Of The Manager Must Be At Least 2 Characters Long"],
 		},
 
-		Addresses: {
+		addresses: {
 			type: [
 				{
 					address: String,
@@ -60,6 +60,6 @@ const SupervisorSchema = new Schema(
 	{ timestamps: true }
 );
 
-const Supervisor = model("Supervisors", SupervisorSchema); // Naming the table(document) in the database
+const Manager = model("Managers", ManagerSchema); // Naming the table(document) in the database
 
-module.exports = Supervisor; // Exporting the schema
+module.exports = Manager; // Exporting the schema

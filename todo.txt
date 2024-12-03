@@ -1,3 +1,20 @@
+
+!!!!!todo!!!!
+have the validation for the key codes to be just a string of at lest 5 pairs (10 char) of one letter one number  or  max or 6 pair (12 char)   or just pairs of numbers  
+
+have the front dor be fill with  front back door or gates 
+
+
+
+!!!!!!!!!!!!!!!!!!!upddddateeeeeee
+
+
+they want that the codes be on tob of each other 
+example: D S S Q S
+         2 4 2 3 4
+
+
+
 managers
     name: String
     cellNumber: string
@@ -121,4 +138,11 @@ key codes
     key way 
     key codes :[string] 
     
+
+
+
+
+
+
+
 
