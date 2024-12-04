@@ -146,3 +146,43 @@ key codes
 
 
 
+
+
+
+{ 
+  "getOneManagerId": "674f1efa02908d780446d5d4",
+  
+  "name": "test",
+  "addresses": [{
+    "address":"2639 Decatur Ave",
+    "city":"Bronx",
+    "state":"NY",
+    "zipCode":"10458"},{
+    "address":"sjkfklsjfl",
+    "city":"Bronx",
+    "state":"NY",
+    "zipCode":"10458"}],
+  "keys": {
+    "keyWay":"2DB",
+    "keyCode":"Q4 B3 B2 Q4 K3",
+    "doorLocation": "Front"
+  },
+  "updateOneManagerId":"674f23c7fbc339213b96bcfa",
+  // "updateOneManagerName2": "this is the change",
+  // "addressesInfo": {
+  //       "addressId":"674f23c7fbc339213b96bcfc",
+  //       "address":"new address",
+  //       "city":"some city",
+  //       "state":"ny",
+  //       "zipCode":"1111",
+  //       "status":"delete"
+  // },
+  "keysInfo": {
+    "keyId": "674f759684b285df04bce365",
+    // "keyWay":"f6h",
+    // "keyCode": "ftdvh 52148",
+    // "doorLocation" : "front",
+    "status": "delete"
+  },
+  "deleteOneManagerId": "674f1f377b0cded9caa406a1"
+}

@@ -1,7 +1,7 @@
 // Importing Schema and model to create the schema and saving it to the database
 const { Schema, model } = require("mongoose");
 
-const ManagerSchema = new Schema(
+const UserSchema = new Schema(
 	{
 		// Attributes for the database
 		name: {
@@ -10,53 +10,28 @@ const ManagerSchema = new Schema(
 			min: [2, "Name Of The Manager Must Be At Least 2 Characters Long"],
 		},
 
-		addresses: {
+		email: {
 			type: [
 				{
 					address: String,
 					city: String,
 					state: String,
 					zipCode: String,
-					keys: {
-						type: [
-							{
-								keyWay: String,
-								keyCode: String,
-								doorLocation: String,
-							},
-						],
-					},
 				},
 			],
-			required: true,
+			require: true,
 		},
 
-		// addresses: {
-		// 	type: [
-		// 		{
-		// 			address: String,
-		// 			city: String,
-		// 			state: String,
-		// 			zipCode: String,
-		// 			keys: {
-		// 				type: [
-		// 					{
-		// 						keyWay: String,
-		// 						keyCode: String,
-		// 						doorLocation: String,
-		// 						// addressId: {
-		// 						// 	type: mongoose.SchemaTypes.ObjectId,
-		// 						// 	ref: "Clients",
-		// 						// 	required: true,
-		// 						// },
-		// 					},
-		// 				],
-		// 				// require: true,
-		// 			},
-		// 		},
-		// 	],
-		// 	require: true,
-		// },
+		keys: {
+			type: [
+				{
+					keyWay: String,
+					keyCode: String,
+					doorLocation: String,
+				},
+			],
+			require: true,
+		},
 
 		// !! no phone numbers
 		// cellPhones: {
@@ -85,6 +60,6 @@ const ManagerSchema = new Schema(
 	{ timestamps: true }
 );
 
-const Manager = model("Managers", ManagerSchema); // Naming the table(document) in the database
+const User = model("Users", UserSchema); // Naming the table(document) in the database
 
 module.exports = Manager; // Exporting the schema

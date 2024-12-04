@@ -1,0 +1,185 @@
+{
+	"getOneManagerId": "674f1efa02908d780446d5d4",
+
+	"name": "test",
+	"addresses": [
+		{
+			"address": "2639 Decatur Ave",
+			"city": "Bronx",
+			"state": "NY",
+			"zipCode": "10458"
+		},
+		{
+			"address": "sjkfklsjfl",
+			"city": "Bronx",
+			"state": "NY",
+			"zipCode": "10458"
+		}
+	],
+	"keys": {
+		"keyWay": "2DB",
+		"keyCode": "Q4 B3 B2 Q4 K3",
+		"doorLocation": "Front"
+	},
+	"updateOneManagerId": "674f23c7fbc339213b96bcfa",
+	// "updateOneManagerName2": "this is the change",
+	// "addressesInfo": {
+	//       "addressId":"674f23c7fbc339213b96bcfc",
+	//       "address":"new address",
+	//       "city":"some city",
+	//       "state":"ny",
+	//       "zipCode":"1111",
+	//       "status":"delete"
+	// },
+	"keysInfo": {
+		"keyId": "674f759684b285df04bce365",
+		// "keyWay":"f6h",
+		// "keyCode": "ftdvh 52148",
+		// "doorLocation" : "front",
+		"status": "delete"
+	},
+	"deleteOneManagerId": "674f1f377b0cded9caa406a1"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"name": "test",
+"addresses": [{
+  "address":"2639 Decatur Ave",
+  "city":"Bronx",
+  "state":"NY",
+  "zipCode":"10458"},{
+  "address":"sjkfklsjfl",
+  "city":"Bronx",
+  "state":"NY",
+  "zipCode":"10458"}],
+"keys": {
+  "keyWay":"2DB",
+  "keyCode":"Q4 B3 B2 Q4 K3",
+  "doorLocation": "Front"
+},
+
+
+
+
+
+
+mutation($updateOneManagerId: ID! $updateOneManagerName2: String $addressesInfo: [AddressUpdateInput], $keysInfo: [keyUpdateInput], ) {
+    updateOneManager(id: $updateOneManagerId , name: $updateOneManagerName2, addressesInfo: $addressesInfo , keysInfo: $keysInfo) {
+       id
+      name
+      addresses {
+        id
+        address
+        city
+        state
+        zipCode
+        keys {
+          id
+          keyWay
+          keyCode
+          doorLocation
+        }
+      }
+  
+    }
+  }
+  
+  
+  
+  
+  mutation($deleteOneManagerId: ID!){
+    deleteOneManager(id: $deleteOneManagerId) {
+        id
+      name
+      addresses {
+        id
+        address
+        city
+        state
+        zipCode
+      }
+      keys {
+        id
+        keyWay
+        keyCode
+        doorLocation
+      }
+    }
+  }
+  
+  
+  yntax Error: Expected Name, found .
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  {"_id":{"$oid":"6750871a228fa787e25ec281"},
+  "name":"i am the new manager"
+  ,"addresses":[{
+        "address":"this is ths addres"
+        ,"city":"thsi is the city"
+        ,"state":"this is the state",
+        "zipCode":"thsi is the zip code",
+        "keys":[{
+            "keyWay":"q74",
+            "keyCode":"fffff 33333",
+            "doorLocation":"back",
+            "_id":{"$oid":"6750871a228fa787e25ec283"}}],
+    
+    "_id":{"$oid":"6750871a228fa787e25ec282"}}],
+        "createdAt":{"$date":{
+            "$numberLong":"1733330714656"
+        }},
+            "updatedAt":{
+                "$date":{
+                    "$numberLong":"1733330714656"
+                    }},
+                    "__v":{"$numberInt":"0"}}
