@@ -11,26 +11,15 @@ const UserSchema = new Schema(
 		},
 
 		email: {
-			type: [
-				{
-					address: String,
-					city: String,
-					state: String,
-					zipCode: String,
-				},
-			],
-			require: true,
+			type: String,
+			required: true,
+			unique: true,
 		},
 
-		keys: {
-			type: [
-				{
-					keyWay: String,
-					keyCode: String,
-					doorLocation: String,
-				},
-			],
-			require: true,
+		password: { type: String, required: true }, // Use bcrypt for hashing
+		role: {
+			name: { type: String, required: true }, // e.g., "admin", "editor", "viewer"
+			permissions: { type: [String], required: true }, // List of permissions for this role
 		},
 
 		// !! no phone numbers

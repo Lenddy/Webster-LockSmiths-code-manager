@@ -31,33 +31,6 @@ const ManagerSchema = new Schema(
 			required: true,
 		},
 
-		// addresses: {
-		// 	type: [
-		// 		{
-		// 			address: String,
-		// 			city: String,
-		// 			state: String,
-		// 			zipCode: String,
-		// 			keys: {
-		// 				type: [
-		// 					{
-		// 						keyWay: String,
-		// 						keyCode: String,
-		// 						doorLocation: String,
-		// 						// addressId: {
-		// 						// 	type: mongoose.SchemaTypes.ObjectId,
-		// 						// 	ref: "Clients",
-		// 						// 	required: true,
-		// 						// },
-		// 					},
-		// 				],
-		// 				// require: true,
-		// 			},
-		// 		},
-		// 	],
-		// 	require: true,
-		// },
-
 		// !! no phone numbers
 		// cellPhones: {
 		// 	type: [
