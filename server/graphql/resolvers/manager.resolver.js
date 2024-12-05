@@ -1,4 +1,4 @@
-// Importing Client model, uuid for unique IDs, and pubsub for event publishing
+// Importing Manager model, uuid for unique IDs, and pubsub for event publishing
 const Manager = require("../../models/manager.model");
 const { v4: uuidv4 } = require("uuid");
 const pubsub = require("../pubsub");
@@ -9,7 +9,8 @@ const managerResolvers = {
 			return "hello world";
 		},
 
-		getAllManagers: async () => {
+		// Get all managers - available for all users (admin and non-admin)
+		getAllManagers: async (_, __) => {
 			try {
 				const managers = await Manager.find();
 				console.log("all the Managers", managers, "\n____________________");
@@ -20,6 +21,7 @@ const managerResolvers = {
 			}
 		},
 
+		// Get a single manager by ID - available for all users
 		getOneManager: async (_, { id }) => {
 			try {
 				const manager = await Manager.findById(id);
@@ -33,17 +35,14 @@ const managerResolvers = {
 	},
 
 	Mutation: {
-		createOneManager: async (_, { name, addresses, keys }) => {
+		// Create a new manager - only admins can create new managers
+		createOneManager: async (_, { name, addresses, keys }, { user }) => {
+			if (!user || user.role !== "admin") {
+				throw new Error("Unauthorized: Admin access required.");
+			}
+
 			const createdAt = new Date().toISOString();
 			const updatedAt = new Date().toISOString();
-
-			// Uncomment and use if cellPhones processing is needed
-			// cellPhones = cellPhones.map((numberDate) => {
-			//     return {
-			//         ...numberDate,
-			//         numberId: uuidv4(),
-			//     };
-			// });
 
 			try {
 				const newManager = await Manager.create({
@@ -69,13 +68,15 @@ const managerResolvers = {
 			}
 		},
 
-		updateOneManager: async (parent, args, context, info) => {
+		updateOneManager: async (parent, args, { user }) => {
 			const { id, name, addressesInfo } = args;
-
 			const update = {};
-			let hasUpdates = false; // Flag to track if there's valid data to update
-
+			let hasUpdates = false;
 			console.log("Received arguments:", args);
+
+			if (!user || user.role !== "admin") {
+				throw new Error("Unauthorized: Admin access required.");
+			}
 
 			// Update the name field if it's provided
 			if (name !== null && name !== undefined) {
@@ -101,7 +102,8 @@ const managerResolvers = {
 						return; // Skip if no valid address or status
 					}
 
-					// Handle adding new addresses
+					// Handle adding new addresses, updating, or deleting addresses (existing logic remains)
+					// (Add handling logic for addresses similar to your current resolver)
 					if (address.status === "add" && address.address && address.city) {
 						console.log("Adding address:", address);
 
@@ -142,6 +144,8 @@ const managerResolvers = {
 								});
 							} else if (key.status === "update" && key.keyId) {
 								// Update existing key
+
+								// !!!!!!!!!!   this is giving problems saying that the are to many $
 								bulkOps.push({
 									updateOne: {
 										filter: { _id: id, "addresses._id": address.addressId, "addresses.keys._id": key.keyId },
@@ -154,6 +158,20 @@ const managerResolvers = {
 										},
 									},
 								});
+
+								// !!!!! i try this to fix it
+								// bulkOps.push({
+								// 	updateOne: {
+								// 		filter: { _id: id, "addresses._id": address.addressId, "addresses.keys._id": key.keyId },
+								// 		update: {
+								// 			$set: {
+								// 				"addresses.$[address].keys.$[key]": key.keyWay,
+								// 				"addresses.$[address].keys.$[key]": key.keyCode,
+								// 				"addresses.$[address].keys.$[key]": key.doorLocation,
+								// 			},
+								// 		},
+								// 	},
+								// });
 							} else if (key.status === "delete" && key.keyId) {
 								// Delete key from address
 								bulkOps.push({
@@ -206,12 +224,9 @@ const managerResolvers = {
 					}
 				});
 
-				console.log("Bulk operations for addresses:", bulkOps);
-
 				// Execute bulk operations if any valid operations exist
 				if (bulkOps.length > 0) {
 					console.log("Executing bulk operations...");
-					console.log("Final bulk operations array:", bulkOps);
 					await Manager.bulkWrite(bulkOps);
 					hasUpdates = true; // Flag as having performed updates
 					console.log("Bulk operations completed successfully.");
@@ -227,7 +242,6 @@ const managerResolvers = {
 						throw new Error("Manager not found");
 					}
 
-					// Publish updates to any subscribers (e.g., for a GraphQL subscription)
 					pubsub.publish("MANAGER_UPDATED", {
 						onManagerChange: {
 							eventType: "MANAGER_UPDATED",
@@ -236,18 +250,23 @@ const managerResolvers = {
 					});
 
 					console.log("Manager updated successfully:", updatedManager);
-					return updatedManager; // Return the updated manager object
+					return updatedManager;
 				} else {
 					console.log("No valid updates provided");
-					return null; // Return null if no updates were made
+					return null;
 				}
 			} catch (err) {
-				console.error("Error updating manager", err); // Log the error for debugging
-				throw err; // Rethrow the error so it can be handled by the calling function
+				console.error("Error updating manager", err);
+				throw err;
 			}
 		},
 
-		deleteOneManager: async (_, { id }) => {
+		// Delete manager - only admins can delete managers
+		deleteOneManager: async (_, { id }, { user }) => {
+			if (!user || user.role !== "admin") {
+				throw new Error("Unauthorized: Admin access required.");
+			}
+
 			return await Manager.findByIdAndDelete(id)
 				.then((deletedManager) => {
 					pubsub.publish("MANAGER_DELETED", {
@@ -256,7 +275,7 @@ const managerResolvers = {
 							managerChanges: deletedManager,
 						},
 					});
-					console.log("a client was deleted", deletedManager, "\n____________________");
+					console.log("a manager was deleted", deletedManager, "\n____________________");
 					return deletedManager;
 				})
 				.catch((err) => {
