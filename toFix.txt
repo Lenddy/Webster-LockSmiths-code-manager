@@ -1,3 +1,7 @@
 
-
+ figure out  why you cant register a user
 continue adding the admin system 
+
+
+
+the authenticator fuction is constanly bein call see what is upp with that 

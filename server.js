@@ -12,14 +12,16 @@ require("dotenv").config(); // Load environment variables from the .env file
 // Import type definitions and resolvers for different entities
 const { managerTypeDef } = require("./server/graphql/types/manager.typeDef");
 const { managerResolvers } = require("./server/graphql/resolvers/manager.resolver");
-/*const { vehicleTypeDef } = require("./server/graphql/types/vehicle.typeDef");
-  const { vehicleResolvers } = require("./server/graphql/resolvers/vehicle.resolver");
-  const { dealTypeDef } = require("./server/graphql/types/deal.typeDef");
+const { userTypeDef } = require("./server/graphql/types/user.typeDef");
+const { userResolver } = require("./server/graphql/resolvers/user.resolver");
+
+const authenticator = require("./server/middleware/tokenAuthenticator");
+/* const { dealTypeDef } = require("./server/graphql/types/deal.typeDef");
   const { dealResolvers } = require("./server/graphql/resolvers/deal.resolver");
   */
 // Merge all type definitions and resolvers into single objects
-const mergedTypeDefs = mergeTypeDefs([managerTypeDef]); // Combine type definitions
-const mergedResolvers = mergeResolvers([managerResolvers]); // Combine resolvers
+const mergedTypeDefs = mergeTypeDefs([managerTypeDef, userTypeDef]); // Combine type definitions
+const mergedResolvers = mergeResolvers([managerResolvers, userResolver]); // Combine resolvers
 
 // Create a GraphQL schema using the merged type definitions and resolvers
 const schema = makeExecutableSchema({
@@ -32,7 +34,21 @@ const startServer = async () => {
 	const httpServer = createServer(app); // Create an HTTP server for the Express app
 
 	const apolloServer = new ApolloServer({
+		introspection: true, // Ensure introspection is enabled
 		schema, // Set the merged GraphQL schema for ApolloServer
+		context: async ({ req }) => {
+			const token = req.headers.authorization?.split(" ")[1]; // Extract token from Authorization header
+			if (token) {
+				try {
+					const user = await authenticator(token); // Validate token and get user details
+					return { user }; // Attach user details to the context
+				} catch (error) {
+					console.error("Authentication error:", error.message);
+					throw new Error("Invalid or expired token.");
+				}
+			}
+			return {}; // Return an empty context for unauthenticated requests
+		},
 	});
 
 	await apolloServer.start(); // Start ApolloServer
