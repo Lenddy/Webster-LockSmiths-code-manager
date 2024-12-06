@@ -1,7 +1,272 @@
+find out why want you add a address and a key at the same time  the key is add twice
 
- figure out  why you cant register a user
-continue adding the admin system 
+
+
+
+
 
 
 
 the authenticator fuction is constanly bein call see what is upp with that 
+
+
+
+
+
+
+		updateOneManager: async (parent, args, { user }) => {
+			if (!user || user.role !== "admin") {
+				throw new Error("Unauthorized: Admin access required.");
+			}
+
+			const { id, name, addressesInfo } = args;
+			const update = {};
+			let hasUpdates = false;
+			// console.log("Received arguments:", args);
+
+			// Update the name field if it's provided
+			if (name !== null && name !== undefined) {
+				update.name = name;
+				hasUpdates = true;
+				// console.log("Name updated:", name);
+			}
+
+			try {
+				const bulkOps = []; // Array to hold bulk operations
+
+				// Normalize addresses to an array if it's a single object
+				const normalizedAddresses = Array.isArray(addressesInfo) ? addressesInfo : addressesInfo ? [addressesInfo] : []; //!! this gets the info from the addressesInfo array
+
+				// console.log("Normalized addresses:", normalizedAddresses);
+
+				// Process addresses and prepare bulk operations
+				normalizedAddresses.forEach((address, i) => {
+					//!! this loops over every element on the normalized info array
+					console.log("adding the address info", i); //address
+
+					if (!address || !address.status) {
+						//!! this checks if the is actual info on the normalized info array
+						console.log("Skipping invalid address:", i, address);
+						return; // Skip if no valid address or status
+					}
+
+					// Handle adding new addresses, updating, or deleting addresses (existing logic remains)
+					// (Add handling logic for addresses similar to your current resolver)
+					if (address.status === "add" && address.address && address.city && address.state && address.zipCode) {
+						// console.log("Adding address:", address);
+
+						// Add address first
+						bulkOps.push({
+							updateOne: {
+								filter: { _id: id },
+								update: { $push: { addresses: { ...address } } },
+							},
+						});
+
+						// Now handle keys associated with the address, if any
+						address.keys?.forEach((key, j) => {
+							console.log("adding the key info ", j);
+
+							if (key.status === "add" && key.keyWay && key.code && key.doorLocation) {
+								// Add the key to the address after the address is added
+								bulkOps.push({
+									updateOne: {
+										filter: { _id: id, "addresses.address": address.address },
+										update: { $push: { "addresses.$.keys": key } },
+									},
+								});
+							}
+						});
+					}
+					// Handle updating existing addresses
+					else if (address.status === "update" && address.addressId) {
+						console.log("Updating address:", address);
+
+						// Process keys within the address for update
+						address.keys.forEach((key) => {
+							console.log("got a key", key, "\n____________________", "\n____________________", "\n____________________");
+							if (key.status === "add") {
+								// Add key to the address using addressId
+								bulkOps.push({
+									updateOne: {
+										filter: { _id: id, "addresses._id": address.addressId },
+										update: { $push: { "addresses.$.keys": key } },
+									},
+								});
+							}
+
+							//TODO: the update need to be fix because is not adding the update to the keys
+							else if (key.status === "update" && key.keyId) {
+								console.log("keys information :", key, "\n____________________", "\n____________________", "\n____________________");
+
+								// Use arrayFilters to target the specific address and key
+								// bulkOps.push({
+								// 	updateOne: {
+								// 		filter: { _id: id }, // Match the document with the manager's ID
+								// 		update: {
+								// 			$set: {
+								// 				"addresses.$[address].keys.$[key].keyWay": key.keyWay,
+								// 				"addresses.$[address].keys.$[key].keyCode": key.keyCode,
+								// 				"addresses.$[address].keys.$[key].doorLocation": key.doorLocation,
+								// 			},
+								// 		},
+								// 		arrayFilters: [
+								// 			{ "address._id": address.addressId }, // Match the specific address by ID
+								// 			{ "address.key._id": key.keyId }, // Match the specific key by ID
+								// 		],
+								// 	},
+								// });
+
+								console.log("Manager ID:", id);
+								console.log("Address ID:", address.addressId);
+								console.log("Key ID:", key.keyId);
+								console.log("Bulk Operation Query:", JSON.stringify(bulkOps, null, 2));
+								bulkOps.push({
+									updateOne: {
+										filter: { _id: id, "address._id": address.addressId, "address.key._id": key.keyId }, // Match the manager //!! "address._id": address.addressId, "key._id": key.keyId
+										update: {
+											$set: {
+												"addresses.$.keys.keyWay": key.keyWay,
+												"addresses.$address.keys.keyCode": key.keyCode,
+												"addresses.$address.keys.doorLocation": key.doorLocation,
+											},
+										},
+
+										// 	filter: { _id: id }, // Match the manager
+										// 	update: {
+										// 		$set: {
+										// 			"addresses.$[address].keys.$[key].keyWay": key.keyWay,
+										// 			"addresses.$[address].keys.$[key].keyCode": key.keyCode,
+										// 			"addresses.$[address].keys.$[key].doorLocation": key.doorLocation,
+										// 		},
+										// 	},
+										// 	arrayFilters: [
+										// 		{ "address._id": address.addressId }, // Match the specific address
+										// 		{ "key._id": key.keyId }, // Match the specific key
+										// 	],
+										// },
+									},
+								});
+
+								//TODO: the update need to be fix because is not adding the update to the keys
+							} else if (key.status === "delete" && key.keyId) {
+								// Delete key from address
+								bulkOps.push({
+									updateOne: {
+										filter: { _id: id, "addresses._id": address.addressId },
+										update: { $pull: { "addresses.$.keys": { _id: key.keyId } } },
+									},
+								});
+							}
+						});
+
+						// Update the address itself after processing keys
+						bulkOps.push({
+							updateOne: {
+								filter: { _id: id, "addresses._id": address.addressId },
+								update: {
+									$set: {
+										"addresses.$.address": address.address,
+										"addresses.$.city": address.city,
+										"addresses.$.state": address.state,
+										"addresses.$.zipCode": address.zipCode,
+									},
+								},
+							},
+						});
+					}
+
+					// Handle deleting addresses
+					else if (address.status === "delete" && address.addressId) {
+						console.log("Deleting address:", address);
+						bulkOps.push({
+							updateOne: {
+								filter: { _id: id },
+								update: { $pull: { addresses: { _id: address.addressId } } },
+							},
+						});
+
+						// If the address is deleted, delete all keys associated with it
+						if (address.keys) {
+							address.keys.forEach((key) => {
+								if (key.keyId) {
+									bulkOps.push({
+										updateOne: {
+											filter: { _id: id, "addresses._id": address.addressId },
+											update: { $pull: { "addresses.$.keys": { _id: key.keyId } } },
+										},
+									});
+								}
+							});
+						}
+					}
+				});
+
+				// Execute bulk operations if any valid operations exist
+				if (bulkOps.length > 0) {
+					console.log("Executing bulk operations...");
+					await Manager.bulkWrite(bulkOps);
+					hasUpdates = true; // Flag as having performed updates
+					console.log("Bulk operations completed successfully.");
+				}
+
+				// Perform the main update if there are updates
+				if (hasUpdates) {
+					console.log("Updating manager with id:", id);
+					const updatedManager = await Manager.findByIdAndUpdate(id, update, { new: true });
+
+					if (!updatedManager) {
+						console.log("Manager not found with id:", id);
+						throw new Error("Manager not found");
+					}
+
+					pubsub.publish("MANAGER_UPDATED", {
+						onManagerChange: {
+							eventType: "MANAGER_UPDATED",
+							managerChanges: updatedManager,
+						},
+					});
+
+					console.log("Manager updated successfully:", updatedManager);
+					return updatedManager;
+				} else {
+					console.log("No valid updates provided");
+					return null;
+				}
+			} catch (err) {
+				console.error("Error updating manager", err);
+				throw err;
+			}
+		},
+
+
+
+
+
+
+
+								// console.log("Manager ID:", id);
+								// console.log("Address ID:", address.addressId);
+								// console.log("Key ID:", key.keyId);
+
+
+
+        	// Use arrayFilters to target the specific address and key
+										// bulkOps.push({
+										// updateOne: {
+										// 	filter: { _id: id }, // Match the document with the manager's ID
+										// 	update: {
+										// 		$set: {
+										// 			"addresses.$[address].keys.$[key].keyWay": key.keyWay,
+										// 			"addresses.$[address].keys.$[key].keyCode": key.keyCode,
+										// 			"addresses.$[address].keys.$[key].doorLocation": key.doorLocation,
+										// 		},
+										// 	},
+										// 	arrayFilters: [
+										// 		{ "address._id": address.addressId }, // Match the specific address by ID
+										// 		{ "address.key._id": key.keyId }, // Match the specific key by ID
+										// 	],
+										// },
+										// });
+
+										!!
